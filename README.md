@@ -1,0 +1,2 @@
+# FlappyMon
+Farcaster mini app
