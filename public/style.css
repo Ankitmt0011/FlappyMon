@@ -8,7 +8,6 @@
 html, body {
   width: 100%;
   height: 100%;
-  background: #0d0f20;
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -17,11 +16,10 @@ html, body {
 }
 
 canvas {
-  background: #0d0f20;
-  border: 2px solid #00ffff;
+  display: block;
   width: 100vw;
   height: 100vh;
-  display: block;
+  background: transparent;
 }
 
 .screen {
