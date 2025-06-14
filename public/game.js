@@ -10,16 +10,22 @@ const startBtn = document.getElementById("startBtn");
 const restartBtn = document.getElementById("restartBtn");
 const finalScoreText = document.getElementById("finalScore");
 
+// Images
 const birdImg = new Image();
 birdImg.src = 'monad-logo-transparent.png';
 
 const bgImg = new Image();
 bgImg.src = 'background.jpg';
 
-// 🎵 Sound effects
+// Sound Effects (preloaded)
 const tapSound = new Audio("tap.wav");
 const gameOverSound = new Audio("gameover.wav");
 const clickSound = new Audio("click.wav");
+
+function playSound(sound) {
+  sound.currentTime = 0;
+  sound.play();
+}
 
 let isGameStarted = false;
 let isGameOver = false;
@@ -90,7 +96,7 @@ function drawScore() {
 }
 
 function drawGameOver() {
-  gameOverSound.play();
+  playSound(gameOverSound);
   gameOverScreen.classList.remove("hidden");
   finalScoreText.innerText = score;
 }
@@ -150,29 +156,27 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-// 🟢 Start button
+// Event Listeners
 startBtn.addEventListener("click", () => {
-  clickSound.play();
+  playSound(clickSound);
   startScreen.classList.add("hidden");
   resetGame();
   isGameStarted = true;
   createPipe();
 });
 
-// 🔁 Restart button
 restartBtn.addEventListener("click", () => {
-  clickSound.play();
+  playSound(clickSound);
   gameOverScreen.classList.add("hidden");
   resetGame();
   isGameStarted = true;
   createPipe();
 });
 
-// 📱 Tap to flap
 canvas.addEventListener("click", () => {
   if (!isGameOver && isGameStarted) {
     bird.velocity = -10;
-    tapSound.play();
+    playSound(tapSound);
   }
 });
 
