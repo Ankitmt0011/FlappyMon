@@ -11,7 +11,12 @@ const restartBtn = document.getElementById("restartBtn");
 const finalScoreText = document.getElementById("finalScore");
 
 const birdImg = new Image();
-birdImg.src = 'monad-logo-transparent.png'; // ✅ Transparent image required
+birdImg.src = 'monad-logo-transparent.png';
+
+const bgImg = new Image();
+bgImg.src = 'background.jpg';
+
+const bgMusic = document.getElementById("bgMusic");
 
 let isGameStarted = false;
 let isGameOver = false;
@@ -19,8 +24,8 @@ let isGameOver = false;
 let bird = {
   x: 50,
   y: 150,
-  width: 50,
-  height: 50,
+  width: 35,
+  height: 35,
   velocity: 0,
   rotation: 0
 };
@@ -49,6 +54,12 @@ function createPipe() {
   });
 }
 
+function drawBackground() {
+  ctx.globalAlpha = 0.6;
+  ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+  ctx.globalAlpha = 1;
+}
+
 function drawBird() {
   ctx.save();
   ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
@@ -58,10 +69,14 @@ function drawBird() {
 }
 
 function drawPipes() {
-  ctx.fillStyle = "#00ff88";
+  ctx.fillStyle = "#22d3ee";
   pipes.forEach(pipe => {
-    ctx.fillRect(pipe.x, 0, 60, pipe.top);
-    ctx.fillRect(pipe.x, pipe.bottom, 60, canvas.height - pipe.bottom);
+    ctx.beginPath();
+    ctx.roundRect(pipe.x, 0, 60, pipe.top, [20]);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.roundRect(pipe.x, pipe.bottom, 60, canvas.height - pipe.bottom, [20]);
+    ctx.fill();
   });
 }
 
@@ -119,9 +134,7 @@ function update() {
 }
 
 function draw() {
-  ctx.fillStyle = "#0f172a";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+  drawBackground();
   drawPipes();
   drawBird();
   drawScore();
@@ -133,23 +146,22 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-// 🟡 Start Game Button
 startBtn.addEventListener("click", () => {
   startScreen.classList.add("hidden");
   resetGame();
   isGameStarted = true;
   createPipe();
+  bgMusic.play();
 });
 
-// 🟡 Play Again Button
 restartBtn.addEventListener("click", () => {
   gameOverScreen.classList.add("hidden");
   resetGame();
   isGameStarted = true;
   createPipe();
+  bgMusic.play();
 });
 
-// 🟡 Canvas tap to jump
 canvas.addEventListener("click", () => {
   if (!isGameOver && isGameStarted) {
     bird.velocity = -10;
