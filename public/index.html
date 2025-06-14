@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flappy Mini</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="game-container">
-    <canvas id="gameCanvas" width="320" height="480"></canvas>
+  <div id="start-screen" class="screen">
+    <h1>Flappy Mini</h1>
+    <button id="startBtn">Start Game</button>
+  </div>
 
-    <div id="start-screen">
-      <h1>Flappy Mini</h1>
-      <button id="startBtn">Start Game</button>
-    </div>
+  <canvas id="gameCanvas" width="360" height="640"></canvas>
 
-    <div id="game-over-screen" class="hidden">
-      <h2>Game Over</h2>
-      <p>Your Score: <span id="finalScore">0</span></p>
-      <button id="restartBtn">Play Again</button>
-    </div>
+  <div id="game-over-screen" class="screen hidden">
+    <h1>Game Over</h1>
+    <h2>Flappy Mini</h2>
+    <p>Your Score: <span id="finalScore">0</span></p>
+    <button id="restartBtn">Play Again</button>
   </div>
 
   <script src="game.js"></script>
