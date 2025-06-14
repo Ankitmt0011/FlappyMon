@@ -13,6 +13,7 @@ html, body {
   justify-content: center;
   align-items: center;
   position: relative;
+  background-color: #0d0f20;
 }
 
 canvas {
@@ -37,15 +38,40 @@ canvas {
   text-align: center;
 }
 
-button {
+#game-over-screen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(13, 15, 32, 0.95);
+  padding: 30px 40px;
+  border-radius: 16px;
+  z-index: 15;
+  text-align: center;
+}
+
+#game-over-screen h2,
+#game-over-screen p {
+  color: #8b5cf6;
+  margin-bottom: 16px;
+}
+
+#startBtn,
+#restartBtn {
   margin-top: 20px;
   padding: 12px 28px;
   background: #4f46e5;
   color: white;
   font-size: 18px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#startBtn:hover,
+#restartBtn:hover {
+  background: #4338ca;
 }
 
 .hidden {
