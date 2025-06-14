@@ -4,11 +4,17 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let isGameStarted = false;
-let isGameOver = false;
+const startScreen = document.getElementById("start-screen");
+const gameOverScreen = document.getElementById("game-over-screen");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+const finalScoreText = document.getElementById("finalScore");
 
 const birdImg = new Image();
-birdImg.src = 'monad-logo-transparent.png'; // Make sure this exists and is transparent
+birdImg.src = 'monad-logo-transparent.png'; // ✅ Transparent image required
+
+let isGameStarted = false;
+let isGameOver = false;
 
 let bird = {
   x: 50,
@@ -31,7 +37,6 @@ function resetGame() {
   pipes = [];
   score = 0;
   isGameOver = false;
-  isGameStarted = false;
 }
 
 function createPipe() {
@@ -67,18 +72,8 @@ function drawScore() {
 }
 
 function drawGameOver() {
-  ctx.fillStyle = "white";
-  ctx.font = "bold 36px sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 40);
-  ctx.font = "24px sans-serif";
-  ctx.fillText("FlappyMon", canvas.width / 2, canvas.height / 2);
-  ctx.fillText("Your Score: " + score, canvas.width / 2, canvas.height / 2 + 40);
-  ctx.fillStyle = "#6366f1";
-  ctx.fillRect(canvas.width / 2 - 75, canvas.height / 2 + 80, 150, 40);
-  ctx.fillStyle = "#ffffff";
-  ctx.fillText("Play Again", canvas.width / 2, canvas.height / 2 + 108);
-  ctx.textAlign = "start";
+  gameOverScreen.classList.remove("hidden");
+  finalScoreText.innerText = score;
 }
 
 function checkCollision(pipe) {
@@ -99,7 +94,6 @@ function update() {
 
   bird.velocity += gravity;
   bird.y += bird.velocity;
-
   bird.rotation = Math.min(Math.max(bird.velocity * 2, -25), 90) * Math.PI / 180;
 
   pipes.forEach(pipe => {
@@ -118,6 +112,7 @@ function update() {
   for (let pipe of pipes) {
     if (checkCollision(pipe)) {
       isGameOver = true;
+      drawGameOver();
       break;
     }
   }
@@ -130,18 +125,6 @@ function draw() {
   drawPipes();
   drawBird();
   drawScore();
-
-  if (!isGameStarted && !isGameOver) {
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "28px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("Tap to Start FlappyMon", canvas.width / 2, canvas.height / 2);
-    ctx.textAlign = "start";
-  }
-
-  if (isGameOver) {
-    drawGameOver();
-  }
 }
 
 function gameLoop() {
@@ -150,32 +133,28 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-// 🟣 Touch or Click to jump / start
-canvas.addEventListener("click", (e) => {
-  const rect = canvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
+// 🟡 Start Game Button
+startBtn.addEventListener("click", () => {
+  startScreen.classList.add("hidden");
+  resetGame();
+  isGameStarted = true;
+  createPipe();
+});
 
-  if (isGameOver) {
-    // Check if Play Again button was clicked
-    if (
-      clickX >= canvas.width / 2 - 75 && clickX <= canvas.width / 2 + 75 &&
-      clickY >= canvas.height / 2 + 80 && clickY <= canvas.height / 2 + 120
-    ) {
-      resetGame();
-      isGameStarted = true;
-      createPipe();
-    }
-    return;
+// 🟡 Play Again Button
+restartBtn.addEventListener("click", () => {
+  gameOverScreen.classList.add("hidden");
+  resetGame();
+  isGameStarted = true;
+  createPipe();
+});
+
+// 🟡 Canvas tap to jump
+canvas.addEventListener("click", () => {
+  if (!isGameOver && isGameStarted) {
+    bird.velocity = -10;
   }
-
-  if (!isGameStarted) {
-    isGameStarted = true;
-    createPipe();
-  }
-
-  bird.velocity = -10; // Jump on every tap
 });
 
 resetGame();
-gameLoop(); // Always run loop so canvas updates even when idle
+gameLoop();
