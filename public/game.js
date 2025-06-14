@@ -7,29 +7,29 @@ const startBtn = document.getElementById("startBtn");
 const restartBtn = document.getElementById("restartBtn");
 const finalScore = document.getElementById("finalScore");
 
-let bird, pipes, gravity, score, isGameOver, animationId;
+let bird;
+let pipes;
+let gravity = 0.6;
+let score;
+let isGameRunning = false;
+let animationFrameId;
 
-function resetGame() {
-  bird = { x: 50, y: 150, width: 20, height: 20, velocity: 0 };
+function initGame() {
+  bird = { x: 50, y: 200, width: 20, height: 20, velocity: 0 };
   pipes = [];
-  gravity = 0.6;
   score = 0;
-  isGameOver = false;
-}
-
-function startGame() {
-  resetGame();
-  startScreen.classList.add("hidden");
+  isGameRunning = true;
   gameOverScreen.classList.add("hidden");
-  animationId = requestAnimationFrame(gameLoop);
+  startScreen.classList.add("hidden");
+  animationFrameId = requestAnimationFrame(gameLoop);
 }
 
 function gameLoop() {
   update();
   draw();
 
-  if (!isGameOver) {
-    animationId = requestAnimationFrame(gameLoop);
+  if (isGameRunning) {
+    animationFrameId = requestAnimationFrame(gameLoop);
   }
 }
 
@@ -38,33 +38,40 @@ function update() {
   bird.y += bird.velocity;
 
   // Pipe logic
-  if (pipes.length === 0 || pipes[pipes.length - 1].x < 200) {
+  if (pipes.length === 0 || pipes[pipes.length - 1].x < 180) {
     const gap = 100;
     const top = Math.random() * 200 + 50;
-    pipes.push({ x: canvas.width, top, bottom: top + gap, passed: false });
+    pipes.push({
+      x: canvas.width,
+      width: 40,
+      top,
+      bottom: top + gap,
+      passed: false,
+    });
   }
 
   pipes.forEach(pipe => {
     pipe.x -= 2;
 
-    if (
-      bird.x + bird.width > pipe.x &&
-      bird.x < pipe.x + 40 &&
-      (bird.y < pipe.top || bird.y + bird.height > pipe.bottom)
-    ) {
-      gameOver();
+    // Score logic
+    if (!pipe.passed && pipe.x + pipe.width < bird.x) {
+      pipe.passed = true;
+      score++;
     }
 
-    if (!pipe.passed && pipe.x + 40 < bird.x) {
-      score++;
-      pipe.passed = true;
+    // Collision logic
+    const collidesX = bird.x + bird.width > pipe.x && bird.x < pipe.x + pipe.width;
+    const collidesY = bird.y < pipe.top || bird.y + bird.height > pipe.bottom;
+    if (collidesX && collidesY) {
+      endGame();
     }
   });
 
-  pipes = pipes.filter(pipe => pipe.x + 40 > 0);
+  pipes = pipes.filter(pipe => pipe.x + pipe.width > 0);
 
-  if (bird.y + bird.height > canvas.height || bird.y < 0) {
-    gameOver();
+  // Collision with ground or ceiling
+  if (bird.y + bird.height >= canvas.height || bird.y <= 0) {
+    endGame();
   }
 }
 
@@ -78,29 +85,35 @@ function draw() {
   // Pipes
   ctx.fillStyle = "green";
   pipes.forEach(pipe => {
-    ctx.fillRect(pipe.x, 0, 40, pipe.top);
-    ctx.fillRect(pipe.x, pipe.bottom, 40, canvas.height - pipe.bottom);
+    ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
+    ctx.fillRect(pipe.x, pipe.bottom, pipe.width, canvas.height - pipe.bottom);
   });
 
   // Score
   ctx.fillStyle = "black";
   ctx.font = "20px Arial";
-  ctx.fillText("Score: " + score, 10, 25);
+  ctx.fillText("Score: " + score, 10, 30);
 }
 
-function gameOver() {
-  isGameOver = true;
-  cancelAnimationFrame(animationId);
+function endGame() {
+  isGameRunning = false;
+  cancelAnimationFrame(animationFrameId);
   finalScore.textContent = score;
   gameOverScreen.classList.remove("hidden");
 }
 
-// Jump on click
+// === Event Listeners ===
+
+startBtn.addEventListener("click", () => {
+  initGame();
+});
+
+restartBtn.addEventListener("click", () => {
+  initGame();
+});
+
 canvas.addEventListener("click", () => {
-  if (!isGameOver) {
+  if (isGameRunning) {
     bird.velocity = -10;
   }
 });
-
-startBtn.addEventListener("click", startGame);
-restartBtn.addEventListener("click", startGame);
