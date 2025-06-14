@@ -74,11 +74,17 @@ function update() {
 }
 
 function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const birdImg = new Image();
+birdImg.src = 'monad-logo-transparent.png';
 
-  ctx.fillStyle = "yellow";
-  ctx.fillRect(bird.x, bird.y, bird.width, bird.height);
-
+let bird = {
+  x: 50,
+  y: 150,
+  width: 40,
+  height: 40,
+  velocity: 0,
+  rotation: 0
+};
   ctx.fillStyle = "green";
   pipes.forEach(pipe => {
     ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
