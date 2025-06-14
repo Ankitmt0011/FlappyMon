@@ -182,3 +182,14 @@ canvas.addEventListener("click", () => {
 
 resetGame();
 gameLoop();
+
+
+restartBtn.addEventListener("click", () => {
+  gameOverSound.pause();           // Stop game over sound
+  gameOverSound.currentTime = 0;  // Reset it to beginning
+  playSound(clickSound);          // Play button click sound
+  gameOverScreen.classList.add("hidden");
+  resetGame();
+  isGameStarted = true;
+  createPipe();
+});
