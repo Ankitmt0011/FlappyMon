@@ -72,7 +72,7 @@ function drawGameOver() {
   ctx.textAlign = "center";
   ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 40);
   ctx.font = "24px sans-serif";
-  ctx.fillText("Flappy Mini", canvas.width / 2, canvas.height / 2);
+  ctx.fillText("FlappyMon", canvas.width / 2, canvas.height / 2);
   ctx.fillText("Your Score: " + score, canvas.width / 2, canvas.height / 2 + 40);
   ctx.fillStyle = "#6366f1";
   ctx.fillRect(canvas.width / 2 - 75, canvas.height / 2 + 80, 150, 40);
@@ -100,7 +100,6 @@ function update() {
   bird.velocity += gravity;
   bird.y += bird.velocity;
 
-  // Tilt bird based on velocity
   bird.rotation = Math.min(Math.max(bird.velocity * 2, -25), 90) * Math.PI / 180;
 
   pipes.forEach(pipe => {
@@ -125,18 +124,18 @@ function update() {
 }
 
 function draw() {
-  ctx.fillStyle = "#0f172a"; // dark background
+  ctx.fillStyle = "#0f172a";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   drawPipes();
   drawBird();
   drawScore();
 
-  if (!isGameStarted) {
+  if (!isGameStarted && !isGameOver) {
     ctx.fillStyle = "#ffffff";
     ctx.font = "28px sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("Tap to Start", canvas.width / 2, canvas.height / 2);
+    ctx.fillText("Tap to Start FlappyMon", canvas.width / 2, canvas.height / 2);
     ctx.textAlign = "start";
   }
 
@@ -152,20 +151,26 @@ function gameLoop() {
 }
 
 canvas.addEventListener("click", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const clickY = e.clientY - rect.top;
+
   if (isGameOver) {
-    const rect = canvas.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
     if (
       clickX >= canvas.width / 2 - 75 && clickX <= canvas.width / 2 + 75 &&
       clickY >= canvas.height / 2 + 80 && clickY <= canvas.height / 2 + 120
     ) {
       resetGame();
     }
-  } else {
-    isGameStarted = true;
-    bird.velocity = -10;
+    return;
   }
+
+  if (!isGameStarted) {
+    isGameStarted = true;
+    createPipe();
+  }
+
+  bird.velocity = -10; // Jump on every tap
 });
 
 resetGame();
