@@ -8,7 +8,7 @@ let isGameStarted = false;
 let isGameOver = false;
 
 const birdImg = new Image();
-birdImg.src = 'monad-logo-transparent.png';
+birdImg.src = 'monad-logo-transparent.png'; // Make sure this exists and is transparent
 
 let bird = {
   x: 50,
@@ -150,17 +150,21 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
+// 🟣 Touch or Click to jump / start
 canvas.addEventListener("click", (e) => {
   const rect = canvas.getBoundingClientRect();
   const clickX = e.clientX - rect.left;
   const clickY = e.clientY - rect.top;
 
   if (isGameOver) {
+    // Check if Play Again button was clicked
     if (
       clickX >= canvas.width / 2 - 75 && clickX <= canvas.width / 2 + 75 &&
       clickY >= canvas.height / 2 + 80 && clickY <= canvas.height / 2 + 120
     ) {
       resetGame();
+      isGameStarted = true;
+      createPipe();
     }
     return;
   }
@@ -174,4 +178,4 @@ canvas.addEventListener("click", (e) => {
 });
 
 resetGame();
-gameLoop();
+gameLoop(); // Always run loop so canvas updates even when idle
