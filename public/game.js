@@ -182,6 +182,18 @@ startBtn.addEventListener("click", async () => {
   isGameStarted = true;
   createPipe();
 });
+startBtn.addEventListener("click", async () => {
+  const address = await connectWallet();
+  if (!address) return;
+
+  const paid = await payEntryFee();
+  if (!paid) return;
+
+  startScreen.classList.add("hidden");
+  resetGame();
+  isGameStarted = true;
+  createPipe();
+});
 
 canvas.addEventListener("click", () => {
   if (!isGameOver && isGameStarted) {
@@ -221,5 +233,39 @@ async function connectWallet() {
   } else {
     alert("Warpcast wallet not available. Please open inside the Warpcast app.");
     return null;
+  }
+}
+
+const GAME_ENTRY_FEE = "0.03"; // MON
+const MONAD_CHAIN_ID = "0x3151c"; // 201804 in hex
+const PROJECT_WALLET_ADDRESS = "0x0d1f61a73f545160E3F005CB90a46beC26621342"; // Replace with your address
+
+async function payEntryFee() {
+  if (!userAddress) return;
+
+  try {
+    // Ensure we're on Monad testnet
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: MONAD_CHAIN_ID }]
+    });
+
+    const tx = {
+      from: userAddress,
+      to: PROJECT_WALLET_ADDRESS,
+      value: "0x" + (parseFloat(GAME_ENTRY_FEE) * 1e18).toString(16), // Convert to hex
+    };
+
+    const txHash = await window.ethereum.request({
+      method: 'eth_sendTransaction',
+      params: [tx],
+    });
+
+    console.log("Entry fee paid. TX Hash:", txHash);
+    return true;
+  } catch (error) {
+    console.error("Transaction failed:", error);
+    alert("Payment failed. Make sure you’re connected to Monad testnet and have test MON.");
+    return false;
   }
 }
