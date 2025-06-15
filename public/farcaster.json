@@ -2,7 +2,7 @@
   "name": "FlappyMon",
   "description": "Tap to flap. Earn tokens. Warpcast gaming begins.",
   "url": "https://flappy-mon.vercel.app/",
-  "icons": ["https://flappy-mon.vercel.app/icon.png"],
+  "icon": "https://flappy-mon.vercel.app/icon.png",
   "frame": {
     "version": "vNext",
     "type": "game"
