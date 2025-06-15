@@ -236,7 +236,7 @@ async function connectWallet() {
   }
 }
 
-const GAME_ENTRY_FEE = "0.03"; // MON
+const GAME_ENTRY_FEE = "0.01"; // MON
 const MONAD_CHAIN_ID = "0x3151c"; // 201804 in hex
 const PROJECT_WALLET_ADDRESS = "0x0d1f61a73f545160E3F005CB90a46beC26621342"; // Replace with your address
 
