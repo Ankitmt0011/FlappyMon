@@ -173,6 +173,16 @@ restartBtn.addEventListener("click", () => {
   createPipe();
 });
 
+startBtn.addEventListener("click", async () => {
+  const address = await connectWallet();
+  if (!address) return;
+
+  startScreen.classList.add("hidden");
+  resetGame();
+  isGameStarted = true;
+  createPipe();
+});
+
 canvas.addEventListener("click", () => {
   if (!isGameOver && isGameStarted) {
     bird.velocity = -10;
@@ -193,3 +203,23 @@ restartBtn.addEventListener("click", () => {
   isGameStarted = true;
   createPipe();
 });
+
+let userAddress = null;
+
+// Connect to the Warpcast wallet
+async function connectWallet() {
+  if (window.ethereum) {
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      userAddress = accounts[0];
+      console.log("Connected to Warpcast wallet:", userAddress);
+      return userAddress;
+    } catch (error) {
+      console.error("User denied wallet connection:", error);
+      return null;
+    }
+  } else {
+    alert("Warpcast wallet not available. Please open inside the Warpcast app.");
+    return null;
+  }
+}
