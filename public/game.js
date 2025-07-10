@@ -269,3 +269,41 @@ async function payEntryFee() {
     return false;
   }
 }
+
+const CONTRACT_ADDRESS = "0x4343F07386231bfF48CeaF12B27E713Cf7611453";
+const ABI = [
+  {
+    "inputs": [{"internalType": "uint256","name": "score","type": "uint256"}],
+    "name": "submitScore","outputs": [],"stateMutability": "nonpayable","type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address","name": "player","type": "address"}],
+    "name": "getHighScore","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],
+    "stateMutability": "view","type": "function"
+  }
+];
+
+let contract;
+
+async function initContract() {
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+}
+
+async function saveScore(score) {
+  if (!contract || !userAddress) return;
+
+  try {
+    const current = await contract.getHighScore(userAddress);
+    if (score > current) {
+      const tx = await contract.submitScore(score);
+      await tx.wait();
+      console.log("Score updated on-chain!");
+    } else {
+      console.log("Score not higher than existing.");
+    }
+  } catch (err) {
+    console.error("Error saving score:", err);
+  }
+}
