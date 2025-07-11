@@ -1,17 +1,13 @@
-import { SignerAuthKit } from '@farcaster/auth-kit';
+const SignerAuthKit = window.SignerAuthKit;
 
 let signer = null;
 let userAddress = null;
 
-/**
- * Connect to Warpcast using Farcaster Auth Kit
- * Returns user's Ethereum address
- */
 export async function connectWarpcast() {
   try {
     signer = new SignerAuthKit();
 
-    const result = await signer.signIn(); // Opens Warpcast sign-in modal
+    const result = await signer.signIn(); // Opens Warpcast modal
 
     if (result && result.status === 'connected') {
       userAddress = result.address;
@@ -28,8 +24,4 @@ export async function connectWarpcast() {
     alert("Error during wallet connection.");
     return null;
   }
-}
-
-export function getConnectedAddress() {
-  return userAddress;
 }
