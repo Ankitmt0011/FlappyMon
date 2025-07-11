@@ -1,36 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="fc:frame" content="vNext">
-<meta name="fc:frame:version" content="vNext">
-<meta name="fc:frame:type" content="game">
-  <meta property="og:title" content="FlappyMon">
-<meta property="og:description" content="Play FlappyMon and earn rewards.">
-<meta property="og:image" content="https://yourapp.com/icon.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Farcaster Mini App Meta Tags -->
+  <meta name="fc:frame" content="vNext" />
+  <meta name="fc:frame:version" content="vNext" />
+  <meta name="fc:frame:type" content="game" />
+
+  <!-- OpenGraph for link preview -->
+  <meta property="og:title" content="FlappyMon" />
+  <meta property="og:description" content="Play FlappyMon on Monad testnet and earn rewards!" />
+  <meta property="og:image" content="https://flappy-mon.vercel.app/icon.png" />
+
+  <!-- Essentials -->
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FlappyMon</title>
   <link rel="stylesheet" href="style.css" />
+
+  <!-- ✅ Load Warpcast AuthKit via CDN -->
+  <script type="module">
+    import { SignerAuthKit } from "https://esm.sh/@farcaster/auth-kit";
+    window.SignerAuthKit = SignerAuthKit;
+  </script>
 </head>
 <body>
+  <!-- Start Screen -->
   <div id="start-screen" class="screen">
     <h1>FlappyMon</h1>
     <button id="startBtn">Start Game</button>
   </div>
 
+  <!-- Game Canvas -->
   <canvas id="gameCanvas"></canvas>
 
+  <!-- Game Over Screen -->
   <div id="game-over-screen" class="hidden">
-  <!-- purple text -->
-<h2 style="color: #8b5cf6;">Game Over</h2>
-<p style="color: #8b5cf6;">Your Score: <span id="finalScore"></span></p>
-  <button id="restartBtn">Play Again</button>
-</div>
+    <h2 style="color: #8b5cf6;">Game Over</h2>
+    <p style="color: #8b5cf6;">Your Score: <span id="finalScore"></span></p>
+    <button id="restartBtn">Play Again</button>
+  </div>
+
+  <!-- Optional Background Music (currently unused) -->
   <audio id="bgMusic" loop>
     <source src="relax-music.mp3" type="audio/mpeg" />
   </audio>
 
-  <script src="game.js"></script>
+  <!-- Load the Game -->
+  <script type="module" src="game.js"></script>
 </body>
 </html>
