@@ -5,6 +5,7 @@ let contract;
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
@@ -14,11 +15,14 @@ const startBtn = document.getElementById("startBtn");
 const restartBtn = document.getElementById("restartBtn");
 const finalScoreText = document.getElementById("finalScore");
 
+// Images
 const birdImg = new Image();
 birdImg.src = 'icon.png';
+
 const bgImg = new Image();
 bgImg.src = 'background.jpg';
 
+// Sounds
 const tapSound = new Audio("tap.wav");
 const gameOverSound = new Audio("gameover.wav");
 const clickSound = new Audio("click.wav");
@@ -30,11 +34,12 @@ function playSound(sound) {
 
 let isGameStarted = false;
 let isGameOver = false;
-let score = 0;
+
+let bird = { x: 50, y: 150, width: 35, height: 35, velocity: 0, rotation: 0 };
 let gravity = 0.5;
 let pipeSpeed = 3;
 let pipes = [];
-let bird = { x: 50, y: 150, width: 35, height: 35, velocity: 0, rotation: 0 };
+let score = 0;
 
 function resetGame() {
   bird.y = 150;
@@ -91,7 +96,11 @@ function drawGameOver() {
 }
 
 function checkCollision(pipe) {
-  return (bird.x + bird.width > pipe.x && bird.x < pipe.x + 60 && (bird.y < pipe.top || bird.y + bird.height > pipe.bottom)) || bird.y + bird.height > canvas.height || bird.y < 0;
+  return (
+    (bird.x + bird.width > pipe.x && bird.x < pipe.x + 60 &&
+      (bird.y < pipe.top || bird.y + bird.height > pipe.bottom)) ||
+    bird.y + bird.height > canvas.height || bird.y < 0
+  );
 }
 
 function update() {
@@ -102,11 +111,15 @@ function update() {
   bird.rotation = Math.min(Math.max(bird.velocity * 2, -25), 90) * Math.PI / 180;
 
   pipes.forEach(pipe => pipe.x -= pipeSpeed);
+
   if (pipes.length > 0 && pipes[0].x + 60 < 0) {
     pipes.shift();
     score++;
   }
-  if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 300) createPipe();
+
+  if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 300) {
+    createPipe();
+  }
 
   for (let pipe of pipes) {
     if (checkCollision(pipe)) {
@@ -130,20 +143,11 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-startBtn.addEventListener("click", async () => {
-  playSound(clickSound);
-  userAddress = await connectWarpcast();
-  if (!userAddress) return;
-
-  const paid = await payEntryFee();
-  if (!paid) return;
-
-  await initContract();
-
-  startScreen.classList.add("hidden");
-  resetGame();
-  isGameStarted = true;
-  createPipe();
+canvas.addEventListener("click", () => {
+  if (!isGameOver && isGameStarted) {
+    bird.velocity = -10;
+    playSound(tapSound);
+  }
 });
 
 restartBtn.addEventListener("click", () => {
@@ -156,19 +160,28 @@ restartBtn.addEventListener("click", () => {
   createPipe();
 });
 
-canvas.addEventListener("click", () => {
-  if (!isGameOver && isGameStarted) {
-    bird.velocity = -10;
-    playSound(tapSound);
+startBtn.addEventListener("click", async () => {
+  playSound(clickSound);
+
+  if (!userAddress) {
+    userAddress = await connectWarpcast();
+    if (!userAddress) return;
   }
+
+  const paid = await payEntryFee();
+  if (!paid) return;
+
+  await initContract();
+
+  startScreen.classList.add("hidden");
+  resetGame();
+  isGameStarted = true;
+  createPipe();
 });
 
-resetGame();
-gameLoop();
-
-// Wallet + Blockchain
-const GAME_ENTRY_FEE = "0.01"; // MON
-const MONAD_CHAIN_ID = "0x3151c";
+// Blockchain logic
+const GAME_ENTRY_FEE = "0.01";
+const MONAD_CHAIN_ID = "0x3151c"; // 201804
 const PROJECT_WALLET_ADDRESS = "0xfc8e4ffEC914D567460AC549a3CD642981A43674";
 
 async function payEntryFee() {
@@ -181,27 +194,33 @@ async function payEntryFee() {
     const tx = {
       from: userAddress,
       to: PROJECT_WALLET_ADDRESS,
-      value: "0x" + (parseFloat(GAME_ENTRY_FEE) * 1e18).toString(16)
+      value: "0x" + (parseFloat(GAME_ENTRY_FEE) * 1e18).toString(16),
     };
 
     const txHash = await window.ethereum.request({
       method: 'eth_sendTransaction',
-      params: [tx]
+      params: [tx],
     });
 
-    console.log("Entry fee paid. TX Hash:", txHash);
+    console.log("Fee paid. Tx:", txHash);
     return true;
-  } catch (error) {
-    console.error("Payment error:", error);
-    alert("Payment failed. Ensure Monad testnet & test MON available.");
+  } catch (e) {
+    alert("Payment failed. Connect Monad testnet.");
     return false;
   }
 }
 
 const CONTRACT_ADDRESS = "0x4343F07386231bfF48CeaF12B27E713Cf7611453";
 const ABI = [
-  { "inputs": [{"internalType": "uint256","name": "score","type": "uint256"}], "name": "submitScore", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
-  { "inputs": [{"internalType": "address","name": "player","type": "address"}], "name": "getHighScore", "outputs": [{"internalType": "uint256","name": "","type": "uint256"}], "stateMutability": "view", "type": "function" }
+  {
+    "inputs": [{"internalType": "uint256","name": "score","type": "uint256"}],
+    "name": "submitScore","outputs": [],"stateMutability": "nonpayable","type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address","name": "player","type": "address"}],
+    "name": "getHighScore","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],
+    "stateMutability": "view","type": "function"
+  }
 ];
 
 async function initContract() {
@@ -212,17 +231,17 @@ async function initContract() {
 
 async function saveScore(score) {
   if (!contract || !userAddress) return;
-
   try {
     const current = await contract.getHighScore(userAddress);
     if (score > current) {
       const tx = await contract.submitScore(score);
       await tx.wait();
-      console.log("Score saved to blockchain!");
-    } else {
-      console.log("Not a high score. Not saved.");
+      console.log("Score saved.");
     }
-  } catch (err) {
-    console.error("Error saving score:", err);
+  } catch (e) {
+    console.error("Error saving score:", e);
   }
 }
+
+resetGame();
+gameLoop();
