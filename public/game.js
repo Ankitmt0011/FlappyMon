@@ -1,3 +1,6 @@
+import { connectWarpcast } from './signer-auth.js';
+
+let userAddress = null;
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
