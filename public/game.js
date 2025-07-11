@@ -12,7 +12,7 @@ const finalScoreText = document.getElementById("finalScore");
 
 // Images
 const birdImg = new Image();
-birdImg.src = 'monad-logo-transparent.png';
+birdImg.src = 'icon.png';
 
 const bgImg = new Image();
 bgImg.src = 'background.jpg';
