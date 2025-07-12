@@ -88,11 +88,13 @@ function drawScore() {
   ctx.fillText("Score: " + score, 20, 40);
 }
 
-function drawGameOver() {
+async function drawGameOver() {
   playSound(gameOverSound);
   gameOverScreen.classList.remove("hidden");
   finalScoreText.innerText = score;
-  saveScore(score);
+
+  // Save score only if it's higher
+  await saveScore(score);
 }
 
 function checkCollision(pipe) {
